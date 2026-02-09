@@ -27,7 +27,7 @@ def main():
         result = cracker.crack(ssid, wordlist)
 
         if result['success']:
-            print(Fore.GREEN + "\n[✓] SUCCESS!")
+            print(Fore.GREEN + "\n[✓] SUCCESS")
             print(Fore.GREEN + f"    Password : {result['password']}")
         else:
             print(Fore.RED + "\n[✗] Password not found in wordlist")
