@@ -4,105 +4,106 @@
 green="\e[32m"
 yellow="\e[33m"
 red="\e[31m"
-blue="\e[34m"
 white="\e[97m"
 cyan="\e[36m"
 reset="\e[0m"
 
+pause() {
+  read -p "Press ENTER to continue..."
+}
+
 progress() {
-  for i in {1..30}; do
-    echo -ne "${green}█${reset}"
-    sleep 0.05
+  for i in {1..40}; do
+    echo -ne "${green}#${reset}"
+    sleep 0.06
   done
   echo
 }
 
 clear
-echo -e "${cyan}"
-echo "================================================"
-echo "              Wireless Control Panel            "
-echo "================================================"
-echo -e "${reset}"
-
+echo -e "${white}"
+echo " aircrack-ng 1.7"
+echo " ================================"
 echo
-echo -e "${white}[1] Scan Wi-Fi Networks"
-echo -e "${white}[2] Target Information"
-echo -e "${white}[3] Monitor Activity"
-echo -e "${white}[4] Password Analysis"
-echo -e "${white}[0] Exit"
+sleep 1
+
+echo -e "${white}Interface\tChipset\t\tDriver"
+echo -e "wlan0\t\tAtheros\t\tath9k"
 echo
-read -p "Select option: " opt
+pause
+clear
 
-case $opt in
+# ---- STEP 1 ----
+echo -e "${white}CH  6 ][ Elapsed: 00:00 ][ 2026-02-10"
+echo
+echo -e "${yellow} BSSID              PWR  Beacons  #Data  CH  MB   ENC   CIPHER  AUTH  ESSID"
+echo -e "${white} ---------------------------------------------------------------------------"
+echo -e " A4:9B:CD:11:44:01  -40      212      34   1  54e  WPA2  CCMP    PSK   FTTH"
+echo -e " A4:9B:CD:11:44:02  -53      188      21   6  54e  WPA2  CCMP    PSK   FTTH-4D18"
+echo
+pause
+clear
 
-1)
-  echo
-  echo -e "${white} [${green}++${white}] Scanning wifi signals"
-  sleep 1
-  progress
-  echo
-  echo -e "${yellow} BSSID              CH   SIGNAL   SECURITY    ESSID"
-  echo " -----------------------------------------------------"
-  echo -e " A4:9B:CD:11:44:01   1   -40 dBm   WPA2        FTTH"
-  echo -e " A4:9B:CD:11:44:02   6   -53 dBm   WPA2        FTTH-4D18"
-  ;;
+# ---- STEP 2 ----
+echo -e "${white}Select target ESSID:"
+echo
+echo -e "${cyan}[1] FTTH"
+echo -e "${cyan}[2] FTTH-4D18"
+echo
+read -p "Target > " target
 
-2)
-  echo
-  echo -e "${cyan}Target profile loaded"
-  echo
-  echo -e "${white}ESSID       : ${yellow}FTTH-4D18"
-  echo -e "${white}Channel     : 6"
-  echo -e "${white}Encryption  : WPA2-PSK"
-  echo -e "${white}Signal      : -53 dBm"
-  echo -e "${white}Clients     : 1"
-  ;;
-
-3)
-  echo
-  echo -e "${white} [${green}++${white}] Monitoring target: ${yellow}FTTH-4D18"
-  sleep 1
-  echo -e "${white} [${green}++${white}] Listening for activity"
-  sleep 1
-  progress
-  echo
-  echo -e "${green}[OK] Client detected: 9C:AF:CA:11:23:88"
-  echo -e "${green}[OK] Session data logged"
-  ;;
-
-4)
-  echo
-  echo -e "${white} [${green}++${white}] Initializing password analysis"
-  sleep 1
-  echo -e "${white} [${green}++${white}] Loading wordlist"
-  sleep 1
-  progress
-
-  echo
-  echo -e "${white} [${green}++${white}] Testing combinations"
-  sleep 2
-  echo -e "${yellow}Attempts: 14,238"
-  sleep 2
-  echo -e "${yellow}Attempts: 29,901"
-  sleep 2
-
-  echo
-  echo -e "${white} [${green}OK${white}] Match detected"
-  sleep 1
-  echo
-  echo -e "${green}Last found password:"
-  echo -e "${yellow}****************"
-  ;;
-
-0)
-  echo -e "${red}Exiting..."
+if [ "$target" == "1" ]; then
+  essid="FTTH"
+elif [ "$target" == "2" ]; then
+  essid="FTTH-4D18"
+else
+  echo -e "${red}Invalid selection"
   exit
-  ;;
+fi
 
-*)
-  echo -e "${red}Invalid option"
-  ;;
-esac
+clear
+echo -e "${white}Monitoring target: ${yellow}$essid"
+sleep 1
+echo -e "${white}Waiting for authentication packets..."
+sleep 2
+progress
 
 echo
-echo -e "${white}Session closed${reset}"
+echo -e "${green}[ WPA handshake captured ]"
+pause
+clear
+
+# ---- STEP 3 ----
+echo -e "${white}Opening aircrack-ng"
+echo
+sleep 1
+echo -e "${white}Reading packets, please wait..."
+sleep 2
+progress
+
+clear
+echo -e "${white}"
+echo " Aircrack-ng 1.7"
+echo
+echo -e "${yellow}ESSID\t\t: $essid"
+echo -e "${yellow}Encryption\t: WPA2"
+echo -e "${yellow}Wordlist\t: rockyou.txt"
+echo
+pause
+clear
+
+# ---- STEP 4 ----
+echo -e "${white}Testing keys..."
+echo
+for i in {1..10}; do
+  printf "Tried %6d keys | Current passphrase: ********\r" $((i*1200))
+  sleep 0.5
+done
+
+echo
+echo
+echo -e "${green}KEY FOUND!"
+echo -e "${white}[ ${yellow}************ ${white}]"
+echo
+echo -e "${white}Session completed"
+echo -e "${reset}"
