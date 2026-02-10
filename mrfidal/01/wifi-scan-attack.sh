@@ -30,9 +30,9 @@ echo -e "CH  6 ][ Elapsed: 00:18 ][ $(date '+%Y-%m-%d %H:%M')"
 echo
 echo -e "${YELLOW} BSSID              PWR  Beacons  #Data  CH  MB   ENC   CIPHER  AUTH  ESSID"
 echo -e "${WHITE} ---------------------------------------------------------------------------"
-sleep 0.6
+sleep 0.5
 echo -e " A4:9B:CD:11:44:01  -39      312     148   1  54e  WPA2  CCMP    PSK   FTTH"
-sleep 0.6
+sleep 0.5
 echo -e " A4:9B:CD:11:44:02  -55      271      93   6  54e  WPA2  CCMP    PSK   FTTH-4D18"
 
 pause
@@ -80,9 +80,9 @@ sleep 1
 
 # ------------------ CRACK LOOP ------------------
 keys=0
-rate=$((RANDOM % 800 + 900))
+rate=1200
 
-examples=(
+wordlist=(
   "password123"
   "ftthwifi2023"
   "homewifi@123"
@@ -90,18 +90,26 @@ examples=(
   "welcome2024"
   "ftth-4d18!"
   "userwifi789"
+  "nashid@123"
 )
 
-for pass in "${examples[@]}"; do
+for pass in "${wordlist[@]}"; do
   keys=$((keys + rate))
-  printf "Tried %9d keys | %4d k/s | Current key: %-18s\r" "$keys" "$rate" "$pass"
-  sleep 0.9
+  printf "\rTried %9d keys | %4d k/s | Current key: %-18s" "$keys" "$rate" "$pass"
+  sleep 0.8
+
+  if [[ "$pass" == "nashid@123" ]]; then
+    echo
+    echo
+    echo -e "${GREEN}[ KEY FOUND ]${RESET}"
+    echo -e "${WHITE}Passphrase: ${CYAN}$pass${RESET}"
+    echo
+    echo -e "${WHITE}Session completed successfully."
+    exit 0
+  fi
 done
 
 echo
 echo
-sleep 1
-
 echo -e "${RED}Passphrase not in dictionary.${RESET}"
 echo -e "${WHITE}Session completed."
-echo -e "${RESET}"
